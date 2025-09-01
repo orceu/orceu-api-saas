@@ -39,4 +39,39 @@ def import_excel_file(
         "file_path": file_path,
         "filename": file.filename
     })
-    return JSONResponse(status_code=status.HTTP_202_ACCEPTED, content={"import_id": import_id, "message": "Arquivo importado com sucesso"})
+    return JSONResponse(status_code=status.HTTP_202_ACCEPTED, content={"import_id": import_id, "message": "Arquivo Excel recebido e enfileirado para importação."})
+
+@router.post("/estimate_analytics", status_code=status.HTTP_202_ACCEPTED)
+def import_estimate_analytics(
+    file: UploadFile = File(...),
+    tenant_id: str = Depends(get_tenant)
+):
+    try:
+        allowed_extensions = [".docx", ".xlsx", ".csv", ".xls"]
+        filename = file.filename.lower()
+        if not any(filename.endswith(ext) for ext in allowed_extensions):
+            raise HTTPException(status_code=400, detail="Arquivo deve ser PDF, DOCX, XLS, XLSX ou CSV")
+        # Valida tamanho do arquivo
+        file.file.seek(0, 2)
+        file_size = file.file.tell()
+        file.file.seek(0)
+        if file_size > MAX_FILE_SIZE_BYTES:
+            raise HTTPException(status_code=413, detail=f"Arquivo excede o limite de {MAX_FILE_SIZE_MB}MB")
+        import_id = str(uuid4())
+        tmp_dir = os.path.join(os.getcwd(), "tmp")
+        os.makedirs(tmp_dir, exist_ok=True)
+        file_path = os.path.join(tmp_dir, f"estimate_analytics_{import_id}_{filename}")
+        with open(file_path, "wb") as f_out:
+            f_out.write(file.file.read())
+        enqueue_import_task({
+            "import_id": import_id,
+            "tenant_id": tenant_id,
+            "file_path": file_path,
+            "filename": file.filename,
+            "type": "estimate_analytics"
+        })
+        return JSONResponse(status_code=status.HTTP_202_ACCEPTED, content={"import_id": import_id, "message": "Documento recebido e tratado com sucesso."})
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"detail": f"Erro interno: {str(e)}"})

@@ -54,3 +54,78 @@ def test_import_excel_file_invalid_extension(client, tmp_path):
     assert response.status_code == 400
     data = response.json()
     assert data["detail"] == "Arquivo deve ser .xls ou .xlsx"
+
+
+def test_import_estimate_analytics_success(client, tmp_path):
+    headers = {"Authorization": f"Bearer {fake_jwt()}"}
+    # Testa .pdf
+    file_content = b"fake pdf content"
+    file_path = tmp_path / "estimate.pdf"
+    file_path.write_bytes(file_content)
+    with open(file_path, "rb") as f:
+        response = client.post(
+            "/v1/imports/estimate_analytics",
+            files={"file": ("estimate.pdf", f, "application/pdf")},
+            headers=headers
+        )
+    assert response.status_code == 202
+    data = response.json()
+    assert "import_id" in data
+    assert data["message"] == "Documento recebido e enfileirado para análise de estimativas."
+
+    # Testa .docx
+    file_path_docx = tmp_path / "estimate.docx"
+    file_path_docx.write_bytes(file_content)
+    with open(file_path_docx, "rb") as f:
+        response = client.post(
+            "/v1/imports/estimate_analytics",
+            files={"file": ("estimate.docx", f, "application/vnd.openxmlformats-officedocument.wordprocessingml.document")},
+            headers=headers
+        )
+    assert response.status_code == 202
+    data = response.json()
+    assert "import_id" in data
+    assert data["message"] == "Documento recebido e enfileirado para análise de estimativas."
+
+    # Testa .xlsx
+    file_path_xlsx = tmp_path / "estimate.xlsx"
+    file_path_xlsx.write_bytes(file_content)
+    with open(file_path_xlsx, "rb") as f:
+        response = client.post(
+            "/v1/imports/estimate_analytics",
+            files={"file": ("estimate.xlsx", f, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")},
+            headers=headers
+        )
+    assert response.status_code == 202
+    data = response.json()
+    assert "import_id" in data
+    assert data["message"] == "Documento recebido e enfileirado para análise de estimativas."
+
+    # Testa .csv
+    file_path_csv = tmp_path / "estimate.csv"
+    file_path_csv.write_bytes(file_content)
+    with open(file_path_csv, "rb") as f:
+        response = client.post(
+            "/v1/imports/estimate_analytics",
+            files={"file": ("estimate.csv", f, "text/csv")},
+            headers=headers
+        )
+    assert response.status_code == 202
+    data = response.json()
+    assert "import_id" in data
+    assert data["message"] == "Documento recebido e enfileirado para análise de estimativas."
+
+def test_import_estimate_analytics_invalid_extension(client, tmp_path):
+    headers = {"Authorization": f"Bearer {fake_jwt()}"}
+    file_content = b"not allowed"
+    file_path = tmp_path / "estimate.txt"
+    file_path.write_bytes(file_content)
+    with open(file_path, "rb") as f:
+        response = client.post(
+            "/v1/imports/estimate_analytics",
+            files={"file": ("estimate.txt", f, "text/plain")},
+            headers=headers
+        )
+    assert response.status_code == 400
+    data = response.json()
+    assert data["detail"] == "Arquivo deve ser PDF, DOCX, XLS, XLSX ou CSV"

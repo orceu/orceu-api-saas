@@ -17,4 +17,3 @@ def get_all_tasks():
         while not _import_queue.empty():
             tasks.append(_import_queue.get())
         return tasks
-

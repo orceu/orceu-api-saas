@@ -9,3 +9,4 @@ router = APIRouter()
 def list_locations(tenant_id: str = Depends(get_tenant)):
     locations = list_locations_usecase(tenant_id)
     return {"locations": locations}
+

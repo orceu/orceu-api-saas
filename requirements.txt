@@ -1,0 +1,27 @@
+# Framework principal para criar a aplicação web/API
+fastapi==0.104.1
+
+# Servidor para rodar localmente a aplicação FastAPI
+uvicorn[standard]==0.24.0
+
+# Para ler arquivos Excel (Planilhas .xlsx, .xls)
+openpyxl==3.1.2
+
+# Alternativa poderosa para dados tabulares (inclui leitura de Excel)
+pandas==2.1.3
+
+# Para autenticação JWT (Criação e validação de tokens)
+python-jose[cryptography]==3.3.0
+
+# Para hashing de senhas (crucial para autenticação)
+passlib[bcrypt]==1.7.4
+
+# Cliente HTTP para fazer requisições para APIs externas (se necessário)
+requests==2.31.0
+
+# Framework alternativo se não estiver usando FastAPI (ESCOHA UM)
+# flask==2.3.3
+# flask-jwt-extended==4.5.3
+
+# Para carregar variáveis de ambiente de um arquivo .env
+python-dotenv==1.0.0

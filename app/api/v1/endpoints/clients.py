@@ -8,3 +8,4 @@ def list_clients():
     # Aqui futuramente será integrado com o orceu-core
     return ["Cliente 1", "Cliente 2"]
 
+

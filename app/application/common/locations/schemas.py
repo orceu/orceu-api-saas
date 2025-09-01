@@ -9,3 +9,4 @@ class LocationResponse(BaseModel):
 class LocationListResponse(BaseModel):
     locations: list[LocationResponse]
 
+
