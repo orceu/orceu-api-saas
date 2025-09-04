@@ -4,6 +4,9 @@ import os
 import boto3
 from botocore.exceptions import ClientError
 
+from dotenv import load_dotenv
+load_dotenv()
+
 
 class S3FileManager:
     def __init__(self):
